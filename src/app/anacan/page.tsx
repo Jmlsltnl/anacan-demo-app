@@ -1,32 +1,24 @@
 import {
   Bell,
-  BookOpen,
   Calendar,
-  Camera,
   ChevronRight,
   Clock3,
   Heart,
   Lightbulb,
-  MessageCircle,
+  ShoppingBag,
   Sparkles,
   Stethoscope,
   ThumbsUp,
   Trophy,
-  Volume2,
 } from "lucide-react";
+import Link from "next/link";
 import { BottomNav } from "./_components/bottom-nav";
 import { Greeting } from "./_components/greeting";
 import { GrowthCard } from "./_components/growth-card";
+import { QuickAccess } from "./_components/quick-access";
 import { RecommendationTeaser } from "./_components/recommendation-teaser";
 import { TeethingCard } from "./_components/teething-card";
 import { TodayHub } from "./_components/today-hub";
-
-const quickAccess = [
-  { icon: MessageCircle, label: "Cry Translator" },
-  { icon: Camera, label: "Baby Photoshoot" },
-  { icon: BookOpen, label: "Fairy Tales" },
-  { icon: Volume2, label: "White Noise" },
-];
 
 const trends = [
   { label: "Avg. feeding", sub: "This week", value: "0.0", icon: "🍽️" },
@@ -66,6 +58,9 @@ export default function AnacanPage() {
             <header className="a-topbar">
               <Greeting />
               <div className="a-topbar-actions">
+                <Link href="/anacan/shop" className="a-icon-btn" aria-label="Anacan Shop">
+                  <ShoppingBag size={16} strokeWidth={2} />
+                </Link>
                 <button type="button" className="a-icon-btn" aria-label="Notifications">
                   <Bell size={16} strokeWidth={2} />
                   <span className="a-dot" />
@@ -135,22 +130,8 @@ export default function AnacanPage() {
               </div>
             </section>
 
-            {/* Quick access */}
-            <section className="a-section">
-              <div className="a-section-head">
-                <h2 className="a-section-title a-heading">Quick access</h2>
-              </div>
-              <div className="a-trio" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
-                {quickAccess.map((tool) => (
-                  <div key={tool.label} className="a-trio-item">
-                    <span className="a-trio-icon" style={{ background: "var(--a-peach-1)", color: "var(--a-accent-ink)" }}>
-                      <tool.icon size={17} strokeWidth={2} />
-                    </span>
-                    <p className="a-trio-label">{tool.label}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
+            {/* Quick access — premium tools open the paywall sheet */}
+            <QuickAccess />
 
             {/* Weekly trends */}
             <section className="a-section">

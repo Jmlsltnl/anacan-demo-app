@@ -407,7 +407,7 @@ export function HomeExperience() {
           </div>
         </div>
 
-        <BottomNav />
+        <BottomNav upsell={false} />
 
         <PaywallSheet open={paywallOpen} onClose={() => setPaywallOpen(false)} />
       </div>

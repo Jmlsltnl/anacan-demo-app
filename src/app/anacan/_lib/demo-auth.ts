@@ -30,6 +30,7 @@ export interface AnacanProfile {
   /* shared funnel answers */
   focus?: string[];
   minutes?: string;
+  discovery?: string;
   reminders?: boolean;
   /* premium state */
   premium?: boolean;
@@ -61,6 +62,8 @@ function read<T>(key: string): T | null {
   }
 }
 
+const STORE_EVENT = "anacan:store";
+
 function write(key: string, value: unknown) {
   if (typeof window === "undefined") return;
   try {
@@ -68,6 +71,17 @@ function write(key: string, value: unknown) {
   } catch {
     /* storage unavailable — prototype keeps working in-memory */
   }
+  window.dispatchEvent(new Event(STORE_EVENT));
+}
+
+/** Subscribe to store changes (same-tab custom event + cross-tab storage). */
+export function subscribeAnacanStore(callback: () => void): () => void {
+  window.addEventListener(STORE_EVENT, callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    window.removeEventListener(STORE_EVENT, callback);
+    window.removeEventListener("storage", callback);
+  };
 }
 
 /* ---------- Account ---------- */

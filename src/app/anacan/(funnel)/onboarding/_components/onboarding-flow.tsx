@@ -12,8 +12,8 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveProfile, type Goal } from "../../../_lib/demo-auth";
+import { PlanSelect } from "../../_components/plan-select";
 import { TextField } from "../../_components/text-field";
-import { Paywall } from "./paywall";
 import { PlanLoading } from "./plan-loading";
 
 /* ---------------- Types & data ---------------- */
@@ -26,6 +26,7 @@ type StepId =
   | "focus"
   | "proof"
   | "habit"
+  | "discovery"
   | "reminders"
   | "building"
   | "reveal"
@@ -40,6 +41,7 @@ const ORDER: StepId[] = [
   "focus",
   "proof",
   "habit",
+  "discovery",
   "reminders",
   "building",
   "reveal",
@@ -47,7 +49,20 @@ const ORDER: StepId[] = [
   "success",
 ];
 
-const QUIZ: StepId[] = ["goal", "name", "detail", "focus", "proof", "habit", "reminders"];
+const QUIZ: StepId[] = ["goal", "name", "detail", "focus", "proof", "habit", "discovery", "reminders"];
+
+const DISCOVERY_OPTIONS = [
+  { id: "instagram", title: "Instagram" },
+  { id: "tiktok", title: "TikTok" },
+  { id: "facebook", title: "Facebook" },
+  { id: "youtube", title: "YouTube" },
+  { id: "friend", title: "Dost və ya ailə" },
+  { id: "influencer", title: "Bloqer / influencer" },
+  { id: "doctor", title: "Həkim tövsiyəsi" },
+  { id: "store", title: "App Store / Google Play" },
+  { id: "search", title: "Google axtarışı" },
+  { id: "other", title: "Digər" },
+];
 
 interface Answers {
   goal: Goal | null;
@@ -63,6 +78,7 @@ interface Answers {
   cycleLen: number;
   focus: string[];
   minutes: string;
+  discovery: string;
   reminders: boolean | null;
 }
 
@@ -206,6 +222,7 @@ export function OnboardingFlow() {
     cycleLen: 28,
     focus: [],
     minutes: "",
+    discovery: "",
     reminders: null,
   });
   const [premiumPlan, setPremiumPlan] = useState<"yearly" | "monthly" | null>(null);
@@ -278,6 +295,7 @@ export function OnboardingFlow() {
       cycleLen: answers.goal === "cycle" ? answers.cycleLen : undefined,
       focus: answers.focus,
       minutes: answers.minutes || undefined,
+      discovery: answers.discovery || undefined,
       reminders: answers.reminders ?? undefined,
     });
   };
@@ -286,14 +304,14 @@ export function OnboardingFlow() {
 
   if (step === "paywall") {
     return (
-      <Paywall
-        momName={name || undefined}
+      <PlanSelect
+        name={name || undefined}
         onSubscribe={(plan) => {
           setPremiumPlan(plan);
           saveProfile({
             premium: true,
             premiumPlan: plan,
-            trialStartedAt: new Date().toISOString(),
+            trialStartedAt: plan === "yearly" ? new Date().toISOString() : undefined,
             onboarded: true,
           });
           goTo("success");
@@ -393,7 +411,7 @@ export function OnboardingFlow() {
             <button type="button" className="f-btn f-btn-primary" onClick={goNext}>
               Başlayaq
             </button>
-            <p className="f-footer-note">Təxminən 2 dəqiqə · 7 qısa sual</p>
+            <p className="f-footer-note">Təxminən 2 dəqiqə · 8 qısa sual</p>
           </>
         );
       case "name":
@@ -887,9 +905,34 @@ export function OnboardingFlow() {
             </div>
           )}
 
+          {step === "discovery" && (
+            <div className="f-step" key="discovery">
+              <h1 className="f-title a-heading">Anacanı necə kəşf etdiniz?</h1>
+              <p className="f-sub">Cavabınız Anacanı daha çox anaya çatdırmağa kömək edir.</p>
+              <div className="f-option-list">
+                {DISCOVERY_OPTIONS.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={`f-option${answers.discovery === option.id ? " selected" : ""}`}
+                    onClick={() => {
+                      set("discovery", option.id);
+                      autoAdvance();
+                    }}
+                  >
+                    {option.title}
+                    <span className="f-option-tick">
+                      <Check size={12} strokeWidth={3.2} />
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {step === "reminders" && (
             <div className="f-step" key="reminders">
-              <h1 className="f-title a-heading">Heç nəyi qaçırmayın</h1>
+              <h1 className="f-title a-heading">Bildirişləri açın</h1>
               <p className="f-sub">
                 Vaxtında, lazımlı qədər — peyvənd, dövr və inkişaf xatırlatmaları. Spam yox, söz veririk.
               </p>
